@@ -30,8 +30,8 @@ pip install litestar-browser-reload
 Parameters of `BrowserReloadPlugin`:
 
 - `watch_paths: Sequence[Union[str, Path]]`: Paths to watch for changes.
-- `ignore_dirs: Sequence[str]| None`: Directory names to ignore.
-- `ignore_entity_patterns: Sequence[str]| None`: File/Directory name patterns to ignore.
+- `ignore_dirs: Sequence[str]| None`: Directory names to ignore. ([example](https://watchfiles.helpmanual.io/api/filters/#watchfiles.DefaultFilter.ignore_dirs))
+- `ignore_entity_patterns: Sequence[str]| None`: File/Directory name patterns to ignore ([example](https://watchfiles.helpmanual.io/api/filters/#watchfiles.DefaultFilter.ignore_entity_patterns)).
 
 ```python
 from pathlib import Path
