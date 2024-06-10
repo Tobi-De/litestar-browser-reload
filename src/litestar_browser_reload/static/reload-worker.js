@@ -3,13 +3,12 @@
 /* eslint-env worker */
 'use strict'
 
-let eventsPath = null
+let wsPath = null
 let port = null
 let currentVersionId = null
-let eventSource = null
+let websocket = null
 
 addEventListener('connect', (event) => {
-  // Only keep one active port, for whichever tab was last loaded.
   if (port) {
     port.close()
   }
@@ -20,19 +19,19 @@ addEventListener('connect', (event) => {
 
 const receiveMessage = (event) => {
   if (event.data.type === 'initialize') {
-    const givenEventsPath = event.data.eventsPath
+    const givenwsPath = event.data.wsPath
 
-    if (givenEventsPath !== eventsPath) {
-      if (eventSource) {
-        eventSource.close()
+    if (givenwsPath !== wsPath) {
+      if (websocket) {
+        websocket.close()
       }
 
       resetConnectTimeout()
 
-      setTimeout(connectToEvents, 0)
+      setTimeout(connectToWebSocket, 0)
     }
 
-    eventsPath = event.data.eventsPath
+    wsPath = event.data.wsPath
   }
 }
 
@@ -58,39 +57,29 @@ const bumpConnectTimeout = () => {
     connectAttempts = 0
     connectTimeoutMs = 3000
   } else if (connectAttempts === 100) {
-    // Give up after 5 minutes.
-    console.debug(
-      '😢 litestar-browser-reload failed to connect after 5 minutes, shutting down.'
-    )
+    console.debug('😢 litestar-browser-reload failed to connect after 5 minutes, shutting down.')
     close()
     return
   }
   if (connectAttempts === 0) {
-    console.debug(
-      '😅 litestar-browser-reload EventSource error, retrying every ' +
-        connectTimeoutMs +
-        'ms'
-    )
+    console.debug('😅 litestar-browser-reload WebSocket error, retrying every ' + connectTimeoutMs + 'ms')
   }
 }
 
-const connectToEvents = () => {
-  if (!eventsPath) {
-    setTimeout(connectToEvents, connectTimeoutMs)
+const connectToWebSocket = () => {
+  if (!wsPath) {
+    setTimeout(connectToWebSocket, connectTimeoutMs)
     return
   }
 
-  eventSource = new EventSource(eventsPath)
+  websocket = new WebSocket(wsPath)
 
-  eventSource.addEventListener('open', () => {
+  websocket.addEventListener('open', () => {
     console.debug('😎 litestar-browser-reload connected')
+    resetConnectTimeout()
   })
 
-  eventSource.addEventListener('message', (event) => {
-    // Reset connection timeout when receiving a message, as it’s proof that
-    // we are actually connected.
-    resetConnectTimeout()
-
+  websocket.addEventListener('message', (event) => {
     const message = JSON.parse(event.data)
 
     if (message.type === 'ping') {
@@ -105,10 +94,16 @@ const connectToEvents = () => {
     }
   })
 
-  eventSource.addEventListener('error', () => {
-    eventSource.close()
-    eventSource = null
+  websocket.addEventListener('error', () => {
+    websocket.close()
+    websocket = null
     bumpConnectTimeout()
-    setTimeout(connectToEvents, connectTimeoutMs)
+    setTimeout(connectToWebSocket, connectTimeoutMs)
+  })
+
+  websocket.addEventListener('close', () => {
+    websocket = null
+    bumpConnectTimeout()
+    setTimeout(connectToWebSocket, connectTimeoutMs)
   })
 }

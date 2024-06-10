@@ -55,8 +55,15 @@ Add the following to your base template:
 
 ```html
 <head>
- ...
- <script src="/browser-reload/static/reload.js"></script>
+    ...
+    {% if request.app.debug %}
+    <script
+        src="/__reload__/static/reload-listener.js"
+        data-worker-script-path="/__reload__/static/reload-worker.js"
+        data-ws-path="/__reload__"
+        defer
+    ></script>
+    {% endif %}
  </head>
 ```
 

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 import logging
+import uuid
 import asyncio
 from pathlib import Path
 from typing import Union, List
@@ -16,7 +17,9 @@ from litestar.static_files import create_static_files_router
 from watchfiles import awatch
 
 
-logger = logging.getLogger("browser_reload")
+logger = logging.getLogger("browser-reload")
+
+version_id = str(uuid.uuid4())
 
 
 def reload_endpoint(watch_paths: List[Union[Path, str]]):
@@ -27,17 +30,18 @@ def reload_endpoint(watch_paths: List[Union[Path, str]]):
             await prompt_reload()
 
     class BrowserReloadHandler(WebsocketListener):
-        path = "/browser-reload"
+        path = "/__reload__"
 
         async def prompt_reload(self):
             if self.ws:
                 logger.debug("prompting reload")
-                await self.ws.send_text("reload")
+                await self.ws.send_json({"type": "reload"})
 
         async def on_accept(self, socket: WebSocket) -> None:  # type: ignore
             logger.debug("reload websocket connecting")
             self._watch_task = asyncio.create_task(watch_reload(self.prompt_reload))
             self.ws = socket
+            await self.ws.send_json({"type": "ping", "versionId": version_id})
 
         async def on_disconnect(self) -> None:  # type: ignore
             logger.debug("reload websocket disconnecting")
@@ -64,7 +68,7 @@ class BrowserReloadPlugin(InitPluginProtocol):
             app_config.route_handlers.append(
                 create_static_files_router(
                     directories=[Path(__file__).parent / "static"],
-                    path="/browser-reload/static",
+                    path="/__reload__/static",
                     name="browser_reload_static",
                     opt={"exclude_from_auth": True},
                     include_in_schema=False,

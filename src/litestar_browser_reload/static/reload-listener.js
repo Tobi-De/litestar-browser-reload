@@ -5,7 +5,7 @@
 {
   const dataset = document.currentScript.dataset
   const workerScriptPath = dataset.workerScriptPath
-  const eventsPath = dataset.eventsPath
+  const wsPath = dataset.wsPath
 
   if (!window.SharedWorker) {
     console.debug('😭 litestar-browser-reload cannot work in this browser.')
@@ -22,7 +22,7 @@
 
     worker.port.postMessage({
       type: 'initialize',
-      eventsPath
+      wsPath
     })
 
     worker.port.start()
