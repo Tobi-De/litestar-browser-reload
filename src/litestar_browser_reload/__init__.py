@@ -1,20 +1,21 @@
 # SPDX-FileCopyrightText: 2024-present Tobi DEGNON <tobidegnon@proton.me>
 #
 # SPDX-License-Identifier: MIT
+import asyncio
 import logging
 import uuid
-import asyncio
 from pathlib import Path
-from typing import Union, List
-from litestar.handlers import WebsocketListener
-
+from typing import List
+from typing import Sequence
+from typing import Union
 
 from litestar import WebSocket
 from litestar.config.app import AppConfig
+from litestar.handlers import WebsocketListener
 from litestar.plugins import InitPluginProtocol
 from litestar.static_files import create_static_files_router
-
 from watchfiles import awatch
+from watchfiles import DefaultFilter
 
 
 logger = logging.getLogger("browser-reload")
@@ -22,11 +23,21 @@ logger = logging.getLogger("browser-reload")
 version_id = str(uuid.uuid4())
 
 
-def reload_endpoint(watch_paths: List[Union[Path, str]]):
+def reload_endpoint(
+    watch_paths: Sequence[Union[Path, str]],
+    ignore_dirs: Sequence[str] | None = None,
+    ignore_entity_patterns: Sequence[str] | None = None,
+):
     # shamelessy copied from https://github.com/samuelcolvin/foxglove/blob/main/foxglove/devtools.py
 
     async def watch_reload(prompt_reload):
-        async for _ in awatch(*watch_paths):
+        async for _ in awatch(
+            *watch_paths,
+            watch_filter=DefaultFilter(
+                ignore_dirs=ignore_dirs,
+                ignore_entity_patterns=ignore_entity_patterns
+            ),
+        ):
             await prompt_reload()
 
     class BrowserReloadHandler(WebsocketListener):
