@@ -17,6 +17,7 @@ Auto browser reload plugin for litestar, intended for use in development.
   - [Installation](#installation)
   - [Usage](#usage)
   - [License](#license)
+  - [Credits](#credits)
 
 ## Installation
 
@@ -50,39 +51,20 @@ app = Litestar(
 
 ```
 
-```javascript
- <script>
-    // Create a new WebSocket connection to the specified endpoint
-    const socket = new WebSocket('ws://localhost:8000/browser-reload');
+Add the following to your base template:
 
-    // Event listener for when the WebSocket connection is opened
-    socket.onopen = function(event) {
-    console.log('WebSocket connection established', event);
-    };
-
-    // Event listener for when a message is received from the server
-    socket.onmessage = function(event) {
-    console.log('Message received from server', event.data);
-    // Check if the received message is 'reload'
-    if (event.data === 'reload') {
-        console.log('Reloading page as instructed by server');
-        // Reload the current page
-        window.location.reload();
-    }
-    };
-
-    // Event listener for when the WebSocket connection is closed
-    socket.onclose = function(event) {
-    console.log('WebSocket connection closed', event);
-    };
-
-    // Event listener for any errors that occur with the WebSocket connection
-    socket.onerror = function(error) {
-    console.log('WebSocket error', error);
-    };
-</script>
+```html
+<head>
+ ...
+ <script src="/browser-reload/static/reload.js"></script>
+ </head>
 ```
 
 ## License
 
 `litestar-browser-reload` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+
+
+## Credits
+
+Much of this was copied from [django-browser-reload](https://github.com/adamchainz/django-browser-reload) and [foxglove](https://github.com/samuelcolvin/foxglove)

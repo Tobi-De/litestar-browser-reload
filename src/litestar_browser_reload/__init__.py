@@ -11,6 +11,8 @@ from litestar.handlers import WebsocketListener
 from litestar import WebSocket
 from litestar.config.app import AppConfig
 from litestar.plugins import InitPluginProtocol
+from litestar.static_files import create_static_files_router
+
 from watchfiles import awatch
 
 
@@ -59,4 +61,13 @@ class BrowserReloadPlugin(InitPluginProtocol):
     def on_app_init(self, app_config: AppConfig) -> AppConfig:
         if app_config.debug:
             app_config.route_handlers.append(reload_endpoint(self.watch_paths))
+            app_config.route_handlers.append(
+                create_static_files_router(
+                    directories=[Path(__file__).parent / "static"],
+                    path="/browser-reload/static",
+                    name="browser_reload_static",
+                    opt={"exclude_from_auth": True},
+                    include_in_schema=False,
+                ),
+            )
         return app_config
