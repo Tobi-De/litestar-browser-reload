@@ -8,7 +8,7 @@
 > [!IMPORTANT]
 > This plugin currently contains minimal features and is a work-in-progress
 
-Auto browser reload plugin for litestar, intended for use in development.
+Automatic browser reload plugin for Litestar, designed for development use.
 
 ## Table of Contents
 
