@@ -5,11 +5,11 @@ build-backend = "hatchling.build"
 [project]
 name = "litestar-browser-reload"
 dynamic = ["version"]
-description = ''
+description = 'Automatic browser reload plugin for Litestar, designed for development use.'
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
-keywords = []
+keywords = ["litestar", "autoreload", "browser"]
 authors = [
   { name = "Tobi DEGNON", email = "tobidegnon@proton.me" },
 ]
@@ -23,13 +23,16 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Software Development",
+  "Typing :: Typed",
+  "Intended Audience :: Developers",
 ]
 dependencies = ["litestar[standard]", "watchfiles"]
 
 [project.urls]
-Documentation = "https://github.com/Tobi DEGNON/litestar-browser-reload#readme"
-Issues = "https://github.com/Tobi DEGNON/litestar-browser-reload/issues"
-Source = "https://github.com/Tobi DEGNON/litestar-browser-reload"
+Documentation = "https://github.com/Tobi-De/litestar-browser-reload#readme"
+Issues = "https://github.com/Tobi-De/litestar-browser-reload/issues"
+Source = "https://github.com/Tobi-De/litestar-browser-reload"
 
 [tool.hatch.version]
 path = "src/litestar_browser_reload/__about__.py"
