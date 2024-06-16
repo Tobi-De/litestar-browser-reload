@@ -1,9 +1,10 @@
 from pathlib import Path
 
-from litestar import Litestar, get
+from litestar import get
+from litestar import Litestar
 from litestar.contrib.jinja import JinjaTemplateEngine
-from litestar.template.config import TemplateConfig
 from litestar.response import Template
+from litestar.template.config import TemplateConfig
 from litestar_browser_reload import BrowserReloadPlugin
 
 

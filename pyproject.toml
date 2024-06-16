@@ -1,21 +1,29 @@
 [build-system]
-requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+requires = [
+  "hatchling",
+]
 
 [project]
 name = "litestar-browser-reload"
-dynamic = ["version"]
-description = 'Automatic browser reload plugin for Litestar, designed for development use.'
+description = "Automatic browser reload plugin for Litestar, designed for development use."
 readme = "README.md"
-requires-python = ">=3.8"
+keywords = [
+  "autoreload",
+  "browser",
+  "litestar",
+]
 license = "MIT"
-keywords = ["litestar", "autoreload", "browser"]
 authors = [
   { name = "Tobi DEGNON", email = "tobidegnon@proton.me" },
 ]
+requires-python = ">=3.8"
 classifiers = [
   "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
   "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
@@ -25,17 +33,26 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
   "Topic :: Software Development",
   "Typing :: Typed",
-  "Intended Audience :: Developers",
 ]
-dependencies = ["litestar[standard]", "watchfiles"]
+dynamic = [
+  "version",
+]
+dependencies = [
+  "litestar[standard]",
+  "watchfiles",
+]
 
-[project.urls]
-Documentation = "https://github.com/Tobi-De/litestar-browser-reload#readme"
-Issues = "https://github.com/Tobi-De/litestar-browser-reload/issues"
-Source = "https://github.com/Tobi-De/litestar-browser-reload"
+urls.Documentation = "https://github.com/Tobi-De/litestar-browser-reload#readme"
+urls.Issues = "https://github.com/Tobi-De/litestar-browser-reload/issues"
+urls.Source = "https://github.com/Tobi-De/litestar-browser-reload"
 
 [tool.hatch.version]
 path = "src/litestar_browser_reload/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "pre-commit",
+]
 
 [tool.hatch.envs.types]
 extra-dependencies = [
@@ -44,8 +61,22 @@ extra-dependencies = [
 [tool.hatch.envs.types.scripts]
 check = "mypy --install-types --non-interactive {args:src/litestar_browser_reload tests}"
 
+[tool.ruff]
+lint.extend-ignore = [
+  "I001",
+  "I002",
+  "S310",
+]
+
+lint.extend-per-file-ignores."example/*" = [
+  "INP001",
+]
+
 [tool.coverage.run]
-source_pkgs = ["litestar_browser_reload", "tests"]
+source_pkgs = [
+  "litestar_browser_reload",
+  "tests",
+]
 branch = true
 parallel = true
 omit = [
@@ -53,8 +84,14 @@ omit = [
 ]
 
 [tool.coverage.paths]
-litestar_browser_reload = ["src/litestar_browser_reload", "*/litestar-browser-reload/src/litestar_browser_reload"]
-tests = ["tests", "*/litestar-browser-reload/tests"]
+litestar_browser_reload = [
+  "src/litestar_browser_reload",
+  "*/litestar-browser-reload/src/litestar_browser_reload",
+]
+tests = [
+  "tests",
+  "*/litestar-browser-reload/tests",
+]
 
 [tool.coverage.report]
 exclude_lines = [
