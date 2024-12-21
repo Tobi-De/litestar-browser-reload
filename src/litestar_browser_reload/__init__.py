@@ -13,8 +13,9 @@ from typing import TYPE_CHECKING
 from litestar.handlers import WebsocketListener
 from litestar.plugins import InitPluginProtocol
 from litestar.static_files import create_static_files_router
-from watchfiles import awatch
+from watchfiles import BaseFilter
 from watchfiles import DefaultFilter
+from watchfiles import awatch
 
 if TYPE_CHECKING:
     from litestar import WebSocket
@@ -25,18 +26,11 @@ logger = logging.getLogger("browser-reload")
 version_id = str(uuid.uuid4())
 
 
-def reload_endpoint(
-    watch_paths: Sequence[Path | str],
-    ignore_dirs: Sequence[str] | None = None,
-    ignore_entity_patterns: Sequence[str] | None = None,
-):
+def reload_endpoint(watch_paths: Sequence[Path | str], watch_filter: BaseFilter):
     # shamelessy copied from https://github.com/samuelcolvin/foxglove/blob/main/foxglove/devtools.py
 
     async def watch_reload(prompt_reload):
-        async for _ in awatch(
-            *watch_paths,
-            watch_filter=DefaultFilter(ignore_dirs=ignore_dirs, ignore_entity_patterns=ignore_entity_patterns),
-        ):
+        async for _ in awatch(*watch_paths, watch_filter=watch_filter):
             await prompt_reload()
 
     class BrowserReloadHandler(WebsocketListener):
@@ -68,12 +62,21 @@ def reload_endpoint(
 
 
 class BrowserReloadPlugin(InitPluginProtocol):
-    def __init__(self, watch_paths: Sequence[Path | str]) -> None:
-        self.watch_paths = watch_paths
+    def __init__(
+            self,
+            watch_paths: Sequence[Path | str | None] = None,
+            watch_filter: BaseFilter | None = None,
+    ) -> None:
+        self.watch_paths = watch_paths or []
+        self.watch_filter = watch_filter or DefaultFilter()
 
     def on_app_init(self, app_config: AppConfig) -> AppConfig:
         if app_config.debug:
-            app_config.route_handlers.append(reload_endpoint(self.watch_paths))
+            app_config.route_handlers.append(
+                reload_endpoint(
+                    watch_paths=self.watch_paths, watch_filter=self.watch_filter
+                )
+            )
             app_config.route_handlers.append(
                 create_static_files_router(
                     directories=[Path(__file__).parent / "static"],
