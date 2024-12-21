@@ -14,7 +14,8 @@ keywords = [
   "browser",
   "litestar",
 ]
-license = "MIT"
+License-Expression = "MIT"
+License-File = "LICENSE.txt"
 authors = [
   { name = "Tobi DEGNON", email = "tobidegnon@proton.me" },
 ]
