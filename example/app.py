@@ -6,6 +6,7 @@ from litestar.contrib.jinja import JinjaTemplateEngine
 from litestar.response import Template
 from litestar.template.config import TemplateConfig
 from litestar_browser_reload import BrowserReloadPlugin
+from watchfiles import DefaultFilter
 
 
 @get("/")
@@ -22,7 +23,10 @@ async def favicon() -> str:
     )
 
 
-browser_reload = BrowserReloadPlugin(watch_paths=(Path("templates"),))
+browser_reload = BrowserReloadPlugin(
+    watch_paths=(Path("templates"),),
+    watch_filter=DefaultFilter(ignore_dirs=(".git", ".hg", ".svn", ".tox")),
+)
 
 app = Litestar(
     route_handlers=[index, favicon],

@@ -30,8 +30,7 @@ pip install litestar-browser-reload
 Parameters of `BrowserReloadPlugin`:
 
 - `watch_paths: Sequence[Union[str, Path]]`: Paths to watch for changes.
-- `ignore_dirs: Sequence[str]| None`: Directory names to ignore. ([example](https://watchfiles.helpmanual.io/api/filters/#watchfiles.DefaultFilter.ignore_dirs))
-- `ignore_entity_patterns: Sequence[str]| None`: File/Directory name patterns to ignore ([example](https://watchfiles.helpmanual.io/api/filters/#watchfiles.DefaultFilter.ignore_entity_patterns)).
+- `watch_filter: BaseFilter | None = None`: A [filter](https://watchfiles.helpmanual.io/api/filters/) to exclude certain directories or patterns.
 
 ```python
 from pathlib import Path
@@ -39,11 +38,14 @@ from pathlib import Path
 from litestar import Litestar
 from litestar.contrib.jinja import JinjaTemplateEngine
 from litestar.template.config import TemplateConfig
-from litestar.response import Template
 from litestar_browser_reload import BrowserReloadPlugin
+from watchfiles import DefaultFilter
 
 templates_path = Path("templates")
-browser_reload = BrowserReloadPlugin(watch_paths=(templates_path,))
+browser_reload = BrowserReloadPlugin(
+    watch_paths=(Path("templates"),),
+    watch_filter=DefaultFilter(ignore_dirs=(".git", ".hg", ".svn", ".tox")),
+)
 
 app = Litestar(
     route_handlers=[],
